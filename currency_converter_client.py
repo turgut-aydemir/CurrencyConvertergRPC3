@@ -6,9 +6,9 @@ def run():
     channel = grpc.insecure_channel('localhost:50051')
     stub = currency_converter_pb2_grpc.CurrencyConverterStub(channel)
 
-    amount = 10.0
-    from_currency = "USD"
-    to_currency = "EUR"
+    amount = float(input("Enter the amount: "))
+    from_currency = input("Enter the source currency: ")
+    to_currency = input("Enter the target currency: ")
 
     request = currency_converter_pb2.CurrencyConversionRequest(amount=amount, from_currency=from_currency, to_currency=to_currency)
     response = stub.ConvertCurrency(request)
