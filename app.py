@@ -1,28 +1,35 @@
-from flask import Flask, render_template
-import requests
+from flask import Flask, render_template, request
 import grpc
 import currency_converter_pb2
 import currency_converter_pb2_grpc
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET', 'POST'])
+# Initialize the gRPC channel and stub
+channel = grpc.insecure_channel('currencyconvertergrpc-server.azurewebsites.net:443')
+stub = currency_converter_pb2_grpc.CurrencyConverterStub(channel)
+
+
+@app.route('/')
 def index():
-    if request.method == 'POST':
-        amount = float(request.form['amount'])
-        from_currency = request.form['from_currency']
-        to_currency = request.form['to_currency']
+    return render_template('index.html')
 
-        channel = grpc.insecure_channel('currencyconvertergrpc-server.azurewebsites.net:443')
-        stub = currency_converter_pb2_grpc.CurrencyConverterStub(channel)
 
-        request = currency_converter_pb2.CurrencyConversionRequest(amount=amount, from_currency=from_currency, to_currency=to_currency)
-        response = stub.ConvertCurrency(request)
+@app.route('/convert', methods=['POST'])
+def convert_currency():
+    amount = float(request.form['amount'])
+    from_currency = request.form['from_currency']
+    to_currency = request.form['to_currency']
 
-        result = response.result
-        return render_template('index.html', result=result, amount=amount, from_currency=from_currency, to_currency=to_currency)
-    else:
-        return render_template('index.html')
+    request_message = currency_converter_pb2.CurrencyConversionRequest(
+        amount=amount, from_currency=from_currency, to_currency=to_currency
+    )
+
+    response = stub.ConvertCurrency(request_message)
+    result = response.result
+
+    return f"Result: {result}"
+
 
 if __name__ == '__main__':
     app.run()
