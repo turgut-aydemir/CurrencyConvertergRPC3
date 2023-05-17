@@ -13,7 +13,7 @@ def index():
         from_currency = request.form['from_currency']
         to_currency = request.form['to_currency']
 
-        channel = grpc.insecure_channel('localhost:50051')
+        channel = grpc.insecure_channel('currencyconvertergrpc-server.azurewebsites.net:443')
         stub = currency_converter_pb2_grpc.CurrencyConverterStub(channel)
 
         request = currency_converter_pb2.CurrencyConversionRequest(amount=amount, from_currency=from_currency, to_currency=to_currency)
