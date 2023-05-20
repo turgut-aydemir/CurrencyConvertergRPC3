@@ -7,8 +7,8 @@ app = Flask(__name__)
 
 # Initialize the gRPC channel and stub
 creds = grpc.ssl_channel_credentials()
-channel = grpc.secure_channel('currencyconvertergrpc-server.azurewebsites.net', creds)
-stub = currency_converter_pb2_grpc.CurrencyConverterStub(channel)
+channel = grpc.secure_channel('currencyconvertergrpc-server.azurewebsites.net:8282', creds)#channel is the address
+stub = currency_converter_pb2_grpc.CurrencyConverterStub(channel)#here we create the stub to go to the channel
 
 
 @app.route('/')
@@ -26,7 +26,7 @@ def convert_currency():
         amount=amount, from_currency=from_currency, to_currency=to_currency
     )
 
-    response = stub.ConvertCurrency(request_message)
+    response = stub.ConvertCurrency(request_message)#here we get the response
     result = response.result
 
     return f"Result: {result}"
